@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: query-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: query
+  template:
+    metadata:
+      labels:
+        app: query
+    spec:
+      containers:
+        - name: query
+          image: diangogav/query:latest
+          imagePullPolicy: Never

@@ -8,14 +8,19 @@ const events = [];
 
 app.use(bodyParser.json());
 
-app.post('/events', (req, res) => {
+app.post('/events', async (req, res) => {
   const event = req.body
+  console.log("Sending event", event);
   events.push(event);
-  axios.post('http://posts-clusterip-service:4000/events', event);
-  axios.post('http://comments-service:4001/events', event);
-  axios.post('http://query-service:4002/events', event);
-  axios.post('http://moderation-service:4003/events', event);
+  try {
+    await axios.post('http://comments-service:4001/events', event);
+    await axios.post('http://posts-clusterip-service:4000/events', event);
+    await axios.post('http://query-service:4002/events', event);
+    await axios.post('http://moderation-service:4003/events', event);
 
+  } catch (error) {
+    console.log("errors sending events", error);
+  }
   res.status(200).json("OK");
 });
 
@@ -23,4 +28,4 @@ app.get('/events', (_req, res) => {
   res.send(events);
 });
 
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
+app.listen(PORT, () => console.log(`Server listening! on port ${PORT}`))
